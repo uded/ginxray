@@ -10,12 +10,14 @@ import (
 	"github.com/aws/aws-xray-sdk-go/header"
 	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
 const headerTraceID = "x-amzn-trace-id"
 
 func Middleware(sn xray.SegmentNamer) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		log.Trace().Msg("Starting X-Ray middleware")
 		traceHeader := header.FromString(c.Request.Header.Get(headerTraceID))
 		var name string
 		if sn != nil {
@@ -31,21 +33,22 @@ func Middleware(sn xray.SegmentNamer) gin.HandlerFunc {
 		captureResponseData(c, seg)
 
 		seg.Close(nil)
+		log.Trace().Msg("X-Ray middleware finished")
 	}
 }
 
 // Write request data to segment
 func captureRequestData(c *gin.Context, seg *xray.Segment) {
-	r := c.Request
+	req := c.Request
 	seg.Lock()
 	defer seg.Unlock()
 	segmentRequest := seg.GetHTTP().GetRequest()
-	segmentRequest.Method = r.Method
-	segmentRequest.URL = r.URL.String()
-	segmentRequest.XForwardedFor = hasXForwardedFor(r)
-	segmentRequest.ClientIP = clientIP(r)
-	segmentRequest.UserAgent = r.UserAgent()
-	c.Writer.Header().Set(headerTraceID, createTraceHeader(r, seg))
+	segmentRequest.Method = req.Method
+	segmentRequest.URL = req.URL.String()
+	segmentRequest.XForwardedFor = hasXForwardedFor(req)
+	segmentRequest.ClientIP = clientIP(req)
+	segmentRequest.UserAgent = req.UserAgent()
+	c.Writer.Header().Set(headerTraceID, createTraceHeader(req, seg))
 }
 
 // Write response data to segment
