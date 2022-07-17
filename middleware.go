@@ -32,7 +32,7 @@ func Middleware(sn xray.SegmentNamer) gin.HandlerFunc {
 		c.Next()
 		captureResponseData(c, seg)
 
-		seg.CloseAndStream(nil)
+		seg.Close(nil)
 		log.Trace().Str("segID", seg.ID).Str("segTraceID", seg.TraceID).Msg("X-Ray middleware finished")
 	}
 }
