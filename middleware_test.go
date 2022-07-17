@@ -1,4 +1,4 @@
-package xray
+package ginxray
 
 import (
 	"net/http"

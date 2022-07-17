@@ -1,4 +1,4 @@
-package xray
+package ginxray
 
 import (
 	"bytes"
@@ -73,7 +73,7 @@ func methodPathSegmentName(r *http.Request) string {
 	return fmt.Sprintf("%s:%s", r.Method, r.URL.Path)
 }
 
-//Add tracing data to header
+// Add tracing data to header
 func createTraceHeader(r *http.Request, seg *xray.Segment) string {
 	trace := parseHeaders(r.Header)
 	if trace["Root"] != "" {

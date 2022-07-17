@@ -1,4 +1,4 @@
-package xray
+package ginxray
 
 import (
 	"context"
@@ -35,8 +35,8 @@ func NewXRayTestDaemon() (*testDaemon, error) {
 	d.Connection = conn
 
 	err = xray.Configure(xray.Config{
-		DaemonAddr:             conn.LocalAddr().String(),
-		ServiceVersion:         "TestVersion",
+		DaemonAddr:       conn.LocalAddr().String(),
+		ServiceVersion:   "TestVersion",
 		SamplingStrategy: &TestSamplingStrategy{},
 	})
 	if err != nil {
