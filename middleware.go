@@ -33,7 +33,7 @@ func Middleware(sn xray.SegmentNamer) gin.HandlerFunc {
 		captureResponseData(c, seg)
 
 		seg.Close(nil)
-		log.Trace().Msg("X-Ray middleware finished")
+		log.Trace().Str("segID", seg.ID).Str("segTraceID", seg.TraceID).Msg("X-Ray middleware finished")
 	}
 }
 
@@ -48,7 +48,9 @@ func captureRequestData(c *gin.Context, seg *xray.Segment) {
 	segmentRequest.XForwardedFor = hasXForwardedFor(req)
 	segmentRequest.ClientIP = clientIP(req)
 	segmentRequest.UserAgent = req.UserAgent()
-	c.Writer.Header().Set(headerTraceID, createTraceHeader(req, seg))
+	traceHeader := createTraceHeader(req, seg)
+	c.Writer.Header().Set(headerTraceID, traceHeader)
+	log.Trace().Str("traceHeader", traceHeader).Msg("captured request data")
 }
 
 // Write response data to segment
@@ -69,6 +71,7 @@ func captureResponseData(c *gin.Context, seg *xray.Segment) {
 	if respStatus >= 500 && respStatus < 600 {
 		seg.Fault = true
 	}
+	log.Trace().Int("status", respStatus).Int("contentLength", c.Writer.Size()).Msg("captured response data")
 }
 
 // Define route name by method and path
