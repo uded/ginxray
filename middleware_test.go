@@ -50,11 +50,11 @@ func TestMiddlewareGeneralCase(t *testing.T) {
 	})
 
 	tdata := []testData{
-		{http.StatusOK, "OK.", "GET", "/", "192.0.2.1:1234", 3, []test_header{}, false, false, false},
+		{http.StatusOK, "OK.", "GET", "/", "192.0.2.1", 3, []test_header{}, false, false, false},
 		{http.StatusOK, "OK.", "GET", "/", "198.0.2.1", 3, []test_header{{"X-Forwarded-For", "198.0.2.1,127.0.0.1"}}, false, false, false},
-		{http.StatusBadRequest, "Bad Request", "GET", "/400", "192.0.2.1:1234", 11, []test_header{}, true, false, false},
-		{http.StatusTooManyRequests, "Too many requests", "POST", "/429", "192.0.2.1:1234", 17, []test_header{}, true, true, false},
-		{http.StatusInternalServerError, "StatusInternalServerError", "GET", "/500", "192.0.2.1:1234", 25, []test_header{}, false, false, true},
+		{http.StatusBadRequest, "Bad Request", "GET", "/400", "192.0.2.1", 11, []test_header{}, true, false, false},
+		{http.StatusTooManyRequests, "Too many requests", "POST", "/429", "192.0.2.1", 17, []test_header{}, true, true, false},
+		{http.StatusInternalServerError, "StatusInternalServerError", "GET", "/500", "192.0.2.1", 25, []test_header{}, false, false, true},
 	}
 	for _, td := range tdata {
 		w := performRequest(router, td.Method, td.Path, td.headers...)

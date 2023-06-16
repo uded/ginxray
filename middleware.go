@@ -46,7 +46,7 @@ func captureRequestData(c *gin.Context, seg *xray.Segment) {
 	segmentRequest.Method = req.Method
 	segmentRequest.URL = req.URL.String()
 	segmentRequest.XForwardedFor = hasXForwardedFor(req)
-	segmentRequest.ClientIP = clientIP(req)
+	segmentRequest.ClientIP = c.ClientIP()
 	segmentRequest.UserAgent = req.UserAgent()
 	traceHeader := createTraceHeader(req, seg)
 	c.Writer.Header().Set(headerTraceID, traceHeader)
@@ -105,15 +105,6 @@ func createTraceHeader(r *http.Request, seg *xray.Segment) string {
 
 func hasXForwardedFor(r *http.Request) bool {
 	return r.Header.Get("X-Forwarded-For") != ""
-}
-
-func clientIP(r *http.Request) string {
-	forwardedFor := r.Header.Get("X-Forwarded-For")
-	if forwardedFor != "" {
-		return strings.TrimSpace(strings.Split(forwardedFor, ",")[0])
-	}
-
-	return r.RemoteAddr
 }
 
 func parseHeaders(h http.Header) map[string]string {
